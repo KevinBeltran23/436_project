@@ -125,5 +125,18 @@ class AddEditReminderViewModel(
             _uiState.update { it.copy(isSaving = false, isSaved = true) }
         }
     }
+    
+    fun deleteReminder() {
+        viewModelScope.launch {
+            if (reminderId != null) {
+                val reminder = repository.getReminder(reminderId)?.reminder
+                if (reminder != null) {
+                    repository.deleteReminder(reminder)
+                    geofenceHelper.removeGeofence(reminder)
+                }
+                _uiState.update { it.copy(isSaved = true) } // Trigger navigation up
+            }
+        }
+    }
 }
 

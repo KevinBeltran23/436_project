@@ -33,6 +33,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zybooks.remindmev2.ui.AppViewModelProvider
 import com.zybooks.remindmev2.ui.viewmodels.AddEditReminderViewModel
 
+import androidx.compose.material.icons.filled.Delete
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditReminderScreen(
@@ -63,6 +65,13 @@ fun AddEditReminderScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (reminderId != null) {
+                        IconButton(onClick = viewModel::deleteReminder) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
                 }
             )
@@ -124,8 +133,8 @@ fun AddEditReminderScreen(
             Slider(
                 value = uiState.geofenceRadius,
                 onValueChange = viewModel::updateRadius,
-                valueRange = 50f..1000f,
-                steps = 19 // (1000-50)/50 = 19 steps approx 50m increments
+                valueRange = 10f..1000f,
+                steps = 0 // Continuous
             )
 
             Spacer(modifier = Modifier.height(16.dp))
