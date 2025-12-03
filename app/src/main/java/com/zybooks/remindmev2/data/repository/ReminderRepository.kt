@@ -31,18 +31,7 @@ class ReminderRepository(private val reminderDao: ReminderDao) {
     }
     
     suspend fun updateReminder(reminder: Reminder, tags: List<String>) {
-        // If using REPLACE strategy in DAO, insert acts as update if ID exists.
-        // However, we need to handle tags.
-        // Easiest is to delete old cross-refs and add new ones.
-        
-        val reminderId = reminderDao.insertReminder(reminder) // Returns ID.
-        
-        // We should probably clear old tags for this reminder first.
-        // But if we used REPLACE, did it cascade delete? 
-        // If ID is same, REPLACE updates the row. It does NOT delete and re-insert in a way that triggers CASCADE DELETE of foreign keys usually, unless the primary key is modified?
-        // Actually, REPLACE on SQLite corresponds to DELETE + INSERT. So yes, it might trigger cascade if foreign keys are enabled.
-        // But Room's @Insert(onConflict = REPLACE) might behave differently depending on implementation.
-        // Safer to manually clear tags.
+        val reminderId = reminderDao.insertReminder(reminder) 
         
         reminderDao.deleteReminderTags(reminderId)
         
@@ -55,9 +44,16 @@ class ReminderRepository(private val reminderDao: ReminderDao) {
             reminderDao.insertReminderTagCrossRef(ReminderTagCrossRef(reminderId, tag!!.id))
         }
     }
+    
+    suspend fun updateReminderStatus(reminder: Reminder) {
+        // Using insert with REPLACE strategy updates the row without affecting foreign keys if the ID is the same
+        // and we don't touch the tags table or cross-ref table here.
+        // WARNING: If onConflict = REPLACE actually does DELETE+INSERT, it WILL cascade delete tags.
+        // To be safe, we should use a specific @Update query in DAO.
+        reminderDao.updateReminder(reminder)
+    }
 
     suspend fun deleteReminder(reminder: Reminder) {
         reminderDao.deleteReminder(reminder)
     }
 }
-

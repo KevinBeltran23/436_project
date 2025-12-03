@@ -8,6 +8,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
+import androidx.room.Update
+
 @Dao
 interface ReminderDao {
     @Transaction
@@ -20,6 +22,9 @@ interface ReminderDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReminder(reminder: Reminder): Long
+    
+    @Update
+    suspend fun updateReminder(reminder: Reminder)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTag(tag: Tag): Long

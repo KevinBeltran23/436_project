@@ -85,7 +85,8 @@ fun ReminderListScreen(
                     items(uiState.reminders) { reminderWithTags ->
                         ReminderItem(
                             reminderWithTags = reminderWithTags,
-                            onClick = { onReminderClick(reminderWithTags.reminder.id) }
+                            onClick = { onReminderClick(reminderWithTags.reminder.id) },
+                            onToggleActive = { viewModel.toggleReminderActive(it) }
                         )
                     }
                 }
@@ -97,7 +98,8 @@ fun ReminderListScreen(
 @Composable
 fun ReminderItem(
     reminderWithTags: ReminderWithTags,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onToggleActive: (com.zybooks.remindmev2.data.local.database.Reminder) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
@@ -140,7 +142,7 @@ fun ReminderItem(
             
             Switch(
                 checked = reminderWithTags.reminder.isActive,
-                onCheckedChange = { /* Todo: Toggle active state */ }
+                onCheckedChange = { onToggleActive(reminderWithTags.reminder) }
             )
         }
     }

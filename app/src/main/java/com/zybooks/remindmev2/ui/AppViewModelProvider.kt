@@ -15,7 +15,8 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             ReminderListViewModel(
-                remindMeApplication().repository
+                remindMeApplication().repository,
+                GeofenceHelper(remindMeApplication())
             )
         }
         initializer {

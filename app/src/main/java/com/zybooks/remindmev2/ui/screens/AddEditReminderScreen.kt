@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -115,6 +116,16 @@ fun AddEditReminderScreen(
                 onValueChange = viewModel::updateTags,
                 label = { Text("Tags (comma separated)") },
                 modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Radius: ${uiState.geofenceRadius.toInt()} meters")
+            Slider(
+                value = uiState.geofenceRadius,
+                onValueChange = viewModel::updateRadius,
+                valueRange = 50f..1000f,
+                steps = 19 // (1000-50)/50 = 19 steps approx 50m increments
             )
 
             Spacer(modifier = Modifier.height(16.dp))
