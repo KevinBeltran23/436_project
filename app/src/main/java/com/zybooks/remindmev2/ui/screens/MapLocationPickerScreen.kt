@@ -40,6 +40,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import android.os.Build
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +57,6 @@ fun MapLocationPickerScreen(
     var properties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = false)) }
     
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-
-import android.os.Build
 
 // ...
 
