@@ -13,6 +13,16 @@ import com.zybooks.remindmev2.data.local.database.Reminder
 
 class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
+    companion object {
+        // 1.a: Toggle this to TRUE to trigger "On Arrival" reminders immediately if you are ALREADY inside the location.
+        // Default is FALSE (do not trigger if already inside).
+        const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = true
+
+        // 2.c: Toggle this to TRUE to FORCE a notification immediately when adding/updating a reminder,
+        // regardless of your location or the reminder type. Useful for testing notification permission/display.
+        const val TEST_FORCE_TRIGGER_NOW = true
+    }
+
     private val geofencingClient = LocationServices.getGeofencingClient(this)
 
     private val geofencePendingIntent: PendingIntent by lazy {
@@ -22,6 +32,14 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     @SuppressLint("MissingPermission")
     fun addGeofence(reminder: Reminder) {
+        // 2.c: Force trigger logic
+        if (TEST_FORCE_TRIGGER_NOW) {
+            NotificationHelper(this).sendNotification(
+                reminder.title, 
+                (reminder.notes ?: "") + " [TEST FORCED TRIGGER]"
+            )
+        }
+
         val geofence = Geofence.Builder()
             .setRequestId(reminder.id.toString())
             .setCircularRegion(reminder.latitude, reminder.longitude, reminder.geofenceRadius)
@@ -31,8 +49,16 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
             )
             .build()
 
+        val initialTrigger = if (reminder.proximityType) {
+            // On Arrival
+            if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE) GeofencingRequest.INITIAL_TRIGGER_ENTER else 0
+        } else {
+            // On Departure: Do not trigger if already outside (default behavior is 0)
+            0
+        }
+
         val geofencingRequest = GeofencingRequest.Builder()
-            .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            .setInitialTrigger(initialTrigger)
             .addGeofence(geofence)
             .build()
 
@@ -57,4 +83,3 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
         }
     }
 }
-
