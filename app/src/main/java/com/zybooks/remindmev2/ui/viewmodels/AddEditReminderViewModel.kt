@@ -18,9 +18,10 @@ data class AddEditReminderUiState(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val geofenceRadius: Float = 100f,
-    val isProximityOnArrival: Boolean = true,
+    val isArrival: Boolean = true,
+    val isDeparture: Boolean = false,
     val notes: String = "",
-    val tags: String = "", // Comma separated for input
+    val tags: String = "", 
     val isActive: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false
@@ -54,7 +55,8 @@ class AddEditReminderViewModel(
                         latitude = reminderWithTags.reminder.latitude,
                         longitude = reminderWithTags.reminder.longitude,
                         geofenceRadius = reminderWithTags.reminder.geofenceRadius,
-                        isProximityOnArrival = reminderWithTags.reminder.proximityType,
+                        isArrival = reminderWithTags.reminder.triggerOnArrival,
+                        isDeparture = reminderWithTags.reminder.triggerOnDeparture,
                         notes = reminderWithTags.reminder.notes ?: "",
                         tags = reminderWithTags.tags.joinToString(", ") { tag -> tag.name },
                         isActive = reminderWithTags.reminder.isActive
@@ -86,8 +88,12 @@ class AddEditReminderViewModel(
         _uiState.update { it.copy(geofenceRadius = radius) }
     }
 
-    fun updateProximityType(onArrival: Boolean) {
-        _uiState.update { it.copy(isProximityOnArrival = onArrival) }
+    fun updateIsArrival(isArrival: Boolean) {
+        _uiState.update { it.copy(isArrival = isArrival) }
+    }
+
+    fun updateIsDeparture(isDeparture: Boolean) {
+        _uiState.update { it.copy(isDeparture = isDeparture) }
     }
 
     fun saveReminder() {
@@ -101,7 +107,8 @@ class AddEditReminderViewModel(
                 latitude = state.latitude,
                 longitude = state.longitude,
                 geofenceRadius = state.geofenceRadius,
-                proximityType = state.isProximityOnArrival,
+                triggerOnArrival = state.isArrival,
+                triggerOnDeparture = state.isDeparture,
                 notes = state.notes,
                 isActive = state.isActive
             )
@@ -116,7 +123,7 @@ class AddEditReminderViewModel(
                 savedId = reminderId
             }
             
-            if (state.isActive) {
+            if (state.isActive && (state.isArrival || state.isDeparture)) {
                 geofenceHelper.addGeofence(reminder.copy(id = savedId))
             } else {
                 geofenceHelper.removeGeofence(reminder.copy(id = savedId))
@@ -125,7 +132,7 @@ class AddEditReminderViewModel(
             _uiState.update { it.copy(isSaving = false, isSaved = true) }
         }
     }
-    
+
     fun deleteReminder() {
         viewModelScope.launch {
             if (reminderId != null) {
@@ -139,4 +146,3 @@ class AddEditReminderViewModel(
         }
     }
 }
-

@@ -17,7 +17,9 @@ class RemindMeApplication : Application() {
             applicationContext,
             AppDatabase::class.java,
             "remindme_db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration()
+        .build()
         repository = ReminderRepository(database.reminderDao())
         settingsRepository = SettingsRepository(database.settingsDao())
     }

@@ -30,8 +30,8 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     @SuppressLint("MissingPermission")
     fun addGeofence(reminder: Reminder) {
-        // Trigger ONLY if we are currently OUTSIDE the geofence and proximityType is FALSE (On Departure)
-        if (TEST_FORCE_TRIGGER_NOW && !reminder.proximityType) {
+        // Trigger ONLY if we are currently OUTSIDE the geofence and triggerOnDeparture is TRUE
+        if (TEST_FORCE_TRIGGER_NOW && reminder.triggerOnDeparture) {
              LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
                  if (location != null) {
                      val results = FloatArray(1)
@@ -51,8 +51,8 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
              }
         }
 
-        // Trigger ONLY if we are currently INSIDE the geofence and proximityType is TRUE (On Arrival)
-        if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE && reminder.proximityType) {
+        // Trigger ONLY if we are currently INSIDE the geofence and triggerOnArrival is TRUE
+        if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE && reminder.triggerOnArrival) {
              LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
                  if (location != null) {
                      val results = FloatArray(1)
@@ -72,21 +72,30 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
              }
         }
 
+        var transitionTypes = 0
+        if (reminder.triggerOnArrival) transitionTypes = transitionTypes or Geofence.GEOFENCE_TRANSITION_ENTER
+        if (reminder.triggerOnDeparture) transitionTypes = transitionTypes or Geofence.GEOFENCE_TRANSITION_EXIT
+        
+        if (transitionTypes == 0) {
+            // No triggers selected, don't add geofence
+            return
+        }
+
         val geofence = Geofence.Builder()
             .setRequestId(reminder.id.toString())
             .setCircularRegion(reminder.latitude, reminder.longitude, reminder.geofenceRadius)
             .setExpirationDuration(Geofence.NEVER_EXPIRE)
-            .setTransitionTypes(
-                if (reminder.proximityType) Geofence.GEOFENCE_TRANSITION_ENTER else Geofence.GEOFENCE_TRANSITION_EXIT
-            )
+            .setTransitionTypes(transitionTypes)
             .build()
 
-        val initialTrigger = if (reminder.proximityType) {
-            // On Arrival
-            if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE) GeofencingRequest.INITIAL_TRIGGER_ENTER else 0
-        } else {
-            // On Departure: Do not trigger if already outside (default behavior is 0)
-            0
+        var initialTrigger = 0
+        if (reminder.triggerOnArrival) {
+            // If we want to trigger on arrival, generally we want INITIAL_TRIGGER_ENTER
+            // But maybe we should respect the test flag here?
+            // The standard behavior is usually to trigger if already inside.
+            // Let's stick to standard + test flag override logic if needed.
+            // Actually, usually we want INITIAL_TRIGGER_ENTER for entry fences.
+            initialTrigger = initialTrigger or GeofencingRequest.INITIAL_TRIGGER_ENTER
         }
 
         val geofencingRequest = GeofencingRequest.Builder()

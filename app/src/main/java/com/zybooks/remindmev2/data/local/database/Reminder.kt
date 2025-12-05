@@ -11,9 +11,9 @@ data class Reminder(
     val locationName: String?,
     val latitude: Double,
     val longitude: Double,
-    val geofenceRadius: Float = 100f, // Default 100m
-    val proximityType: Boolean = true, // true = On Arrival, false = On Departure (implied)
+    val geofenceRadius: Float = 100f,
+    val triggerOnArrival: Boolean = true,
+    val triggerOnDeparture: Boolean = false,
     val notes: String?,
     val isActive: Boolean = true
 )
-

@@ -140,10 +140,19 @@ fun AddEditReminderScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("On Arrival")
+                Text("Trigger on Arrival")
                 Switch(
-                    checked = uiState.isProximityOnArrival,
-                    onCheckedChange = viewModel::updateProximityType,
+                    checked = uiState.isArrival,
+                    onCheckedChange = viewModel::updateIsArrival,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Trigger on Departure")
+                Switch(
+                    checked = uiState.isDeparture,
+                    onCheckedChange = viewModel::updateIsDeparture,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
