@@ -46,10 +46,6 @@ class ReminderRepository(private val reminderDao: ReminderDao) {
     }
     
     suspend fun updateReminderStatus(reminder: Reminder) {
-        // Using insert with REPLACE strategy updates the row without affecting foreign keys if the ID is the same
-        // and we don't touch the tags table or cross-ref table here.
-        // WARNING: If onConflict = REPLACE actually does DELETE+INSERT, it WILL cascade delete tags.
-        // To be safe, we should use a specific @Update query in DAO.
         reminderDao.updateReminder(reminder)
     }
 
