@@ -14,11 +14,11 @@ import com.zybooks.remindmev2.data.local.database.Reminder
 class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     companion object {
-        // Toggle this to so "On Arrival" alerts immediately if already inside the location (dont want this behavior normally)
-        const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = false
+        // Toggle this so "On Arrival" alerts immediately if already inside the location (dont want this behavior normally)
+        const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = true
 
         // Toggle this to TRUE to FORCE a notification immediately regardless of where you are (used to test "on departure")
-        const val TEST_FORCE_TRIGGER_NOW = false
+        const val TEST_FORCE_TRIGGER_NOW = true
     }
 
     private val geofencingClient = LocationServices.getGeofencingClient(this)
