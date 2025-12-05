@@ -42,7 +42,15 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                         val reminderWithTags = repository.getReminder(reminderId)
                         if (reminderWithTags != null) {
                             val title = reminderWithTags.reminder.title
-                            val message = reminderWithTags.reminder.notes ?: "You have arrived!"
+                            val transitionType = geofenceTransition
+                            val baseMessage = reminderWithTags.reminder.notes ?: ""
+                            
+                            val message = when (transitionType) {
+                                Geofence.GEOFENCE_TRANSITION_ENTER -> "Arrived: $baseMessage"
+                                Geofence.GEOFENCE_TRANSITION_EXIT -> "Departed: $baseMessage"
+                                else -> baseMessage
+                            }
+                            
                             notificationHelper.sendNotification(title, message)
                         }
                     }

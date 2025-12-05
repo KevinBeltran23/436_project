@@ -18,7 +18,7 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
         const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = false
 
         // Toggle this to TRUE to FORCE a notification immediately regardless of where you are (used to test "on departure")
-        const val TEST_FORCE_TRIGGER_NOW = true
+        const val TEST_FORCE_TRIGGER_NOW = false
     }
 
     private val geofencingClient = LocationServices.getGeofencingClient(this)
