@@ -14,13 +14,11 @@ import com.zybooks.remindmev2.data.local.database.Reminder
 class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     companion object {
-        // 1.a: Toggle this to TRUE to trigger "On Arrival" reminders immediately if you are ALREADY inside the location.
-        // Default is FALSE (do not trigger if already inside).
+        // Toggle this to so "On Arrival" alerts immediately if already inside the location (dont want this behavior normally)
         const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = true
 
-        // 2.c: Toggle this to TRUE to FORCE a notification immediately when adding/updating a reminder,
-        // regardless of your location or the reminder type. Useful for testing notification permission/display.
-        const val TEST_FORCE_TRIGGER_NOW = true
+        // Toggle this to TRUE to FORCE a notification immediately on edit or creation of reminder regardless of where you are
+        const val TEST_FORCE_TRIGGER_NOW = false
     }
 
     private val geofencingClient = LocationServices.getGeofencingClient(this)
@@ -38,6 +36,29 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
                 reminder.title, 
                 (reminder.notes ?: "") + " [TEST FORCED TRIGGER]"
             )
+        }
+
+        // Manual check for TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE
+        // This ensures that if the Play Services INITIAL_TRIGGER_ENTER doesn't fire immediately due to delay,
+        // we manually verify the location and trigger it
+        if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE && reminder.proximityType) {
+             LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
+                 if (location != null) {
+                     val results = FloatArray(1)
+                     android.location.Location.distanceBetween(
+                         location.latitude, location.longitude,
+                         reminder.latitude, reminder.longitude,
+                         results
+                     )
+                     // If inside radius
+                     if (results[0] <= reminder.geofenceRadius) {
+                         NotificationHelper(this).sendNotification(
+                             reminder.title, 
+                             reminder.notes ?: "You have arrived! [Already Inside Test]"
+                         )
+                     }
+                 }
+             }
         }
 
         val geofence = Geofence.Builder()
