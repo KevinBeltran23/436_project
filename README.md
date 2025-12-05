@@ -2,30 +2,34 @@
 
 ## Description
 
-RemindMe is a location-based reminder application that allows users to set reminders that trigger when entering or leaving specific locations. Users can manage their reminders, tag them for organization, and customize their settings. The app serves as a simple personal assistant to help users remember tasks associated with physical places.
+Location-based reminder application
+
+- Allows users to set reminders that trigger when entering or leaving specific locations
+- Users can manage their reminders, tag them for organization, and customize their settings
+- The app serves as a simple personal assistant to help users remember tasks associated with physical places
 
 ## Design
 
-The app follows a Material 3 design with the following screens:
+Here is a link to my [Figma](https://github.com/KevinBeltran23/436_project/blob/main/436_design.fg)
 
-- **Reminder List:** Displays all active and inactive reminders, filterable by tags.
-- **Add/Edit Reminder:** Allows users to create or modify reminders, set location, radius, and notes.
-- **Location Picker:** A map interface using Google Maps SDK to pinpoint locations.
-- **Settings:** Options for dark mode and notifications.
+- **Reminder List:** Displays all active and inactive reminders
+- **Add/Edit Reminder:** Allows users to create or modify reminders
+- **Location Picker:** A map interface using Google Maps SDK to pinpoint locations
+- **Settings:** Options for dark mode and push notifications
 
 ## Features
 
 ### Android & Jetpack Compose Features
 
-- **Jetpack Compose:** Fully declarative UI toolkit for building native UI.
-- **Navigation Compose:** Single-activity architecture with composable destinations.
-- **Room Database:** Local data persistence for reminders and settings.
-- **Google Maps SDK:** Interactive map for location selection.
-- **Geofencing API (Play Services Location):** Triggers background notifications when entering/exiting geofences.
-- **Fused Location Provider:** Efficient location tracking.
-- **ViewModel & StateFlow:** Reactive state management following MVVM architecture.
-- **Kotlin Coroutines:** Asynchronous programming for database and location operations.
-- **Notification Manager:** System notifications for alerts.
+- **Jetpack Compose:**
+- **Navigation Compose:** Single-activity architecture with composable destinations
+- **Room Database:**
+- **Google Maps SDK:** Interactive map for location selection
+- **Geofencing API (Play Services Location):** Triggers background notifications when entering/exiting geofences
+- **Fused Location Provider:**
+- **ViewModel & StateFlow:**
+- **Kotlin Coroutines:**
+- **Notification Manager:**
 
 ## Dependencies
 
@@ -39,4 +43,4 @@ The app follows a Material 3 design with the following screens:
 1. Clone the repository.
 2. Open in Android Studio.
 3. Get local properties file from me and add it to root
-4. Build and run on a device or emulator with Google Play Services.
+4. Build and run on a device or emulator
