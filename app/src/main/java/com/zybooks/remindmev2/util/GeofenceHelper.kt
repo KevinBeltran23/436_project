@@ -15,10 +15,10 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     companion object {
         // Toggle this to so "On Arrival" alerts immediately if already inside the location (dont want this behavior normally)
-        const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = true
+        const val TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE = false
 
-        // Toggle this to TRUE to FORCE a notification immediately on edit or creation of reminder regardless of where you are
-        const val TEST_FORCE_TRIGGER_NOW = false
+        // Toggle this to TRUE to FORCE a notification immediately regardless of where you are (used to test "on departure")
+        const val TEST_FORCE_TRIGGER_NOW = true
     }
 
     private val geofencingClient = LocationServices.getGeofencingClient(this)
@@ -30,17 +30,28 @@ class GeofenceHelper(base: Context) : ContextWrapper(base) {
 
     @SuppressLint("MissingPermission")
     fun addGeofence(reminder: Reminder) {
-        // 2.c: Force trigger logic
-        if (TEST_FORCE_TRIGGER_NOW) {
-            NotificationHelper(this).sendNotification(
-                reminder.title, 
-                (reminder.notes ?: "") + " [TEST FORCED TRIGGER]"
-            )
+        // Trigger ONLY if we are currently OUTSIDE the geofence and proximityType is FALSE (On Departure)
+        if (TEST_FORCE_TRIGGER_NOW && !reminder.proximityType) {
+             LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
+                 if (location != null) {
+                     val results = FloatArray(1)
+                     android.location.Location.distanceBetween(
+                         location.latitude, location.longitude,
+                         reminder.latitude, reminder.longitude,
+                         results
+                     )
+                     // If OUTSIDE radius
+                     if (results[0] > reminder.geofenceRadius) {
+                         NotificationHelper(this).sendNotification(
+                             reminder.title, 
+                             (reminder.notes ?: "") + " [Already Outside/Departed Test]"
+                         )
+                     }
+                 }
+             }
         }
 
-        // Manual check for TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE
-        // This ensures that if the Play Services INITIAL_TRIGGER_ENTER doesn't fire immediately due to delay,
-        // we manually verify the location and trigger it
+        // Trigger ONLY if we are currently INSIDE the geofence and proximityType is TRUE (On Arrival)
         if (TEST_TRIGGER_ENTER_IF_ALREADY_INSIDE && reminder.proximityType) {
              LocationServices.getFusedLocationProviderClient(this).lastLocation.addOnSuccessListener { location ->
                  if (location != null) {
