@@ -44,3 +44,7 @@ Here is a link to my [Figma](https://github.com/KevinBeltran23/436_project/blob/
 2. Open in Android Studio.
 3. Get local properties file from me and add it to root
 4. Build and run on a device or emulator
+
+## Testing
+
+go to GeoFenceHelper.kt and set flags to true to force notifications based on whether you're inside or outside geofence
